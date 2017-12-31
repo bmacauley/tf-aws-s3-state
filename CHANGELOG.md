@@ -6,7 +6,7 @@ All notable changes to tf-aws-state will be documented in this file. The format 
 * create a state bucket
 * bucket suffix
 * random_id suffix
-* set bucket policy for encryption
+* use default encryption
 * Set ACL as 'private'
 * Enable versioning
 * Create a DynamoDB lock table with the same name as state bucket

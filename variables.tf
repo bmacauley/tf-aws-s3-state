@@ -1,3 +1,5 @@
+
+
 //
 // Module: tf-aws-s3-state
 //
@@ -36,13 +38,13 @@ variable "region" {
 
 # bucket suffix
 variable "bucket_suffix" {
-  default = "terraform"
+  default = "bm-uk"
 }
 
 # enable random_id suffix
 # eg tfstate-de48g5
 variable "random_id_suffix_enable" {
-  default = 1
+  default = true
 }
 
 
@@ -56,7 +58,7 @@ variable "force_destroy" {
 # Set common tags on the state bucket
 variable "common_tags" {
   default = {
-    created_by   = "terraform"
+    terraform   = "true"
     project_id   = ""
     project_name = ""
     environment  = ""

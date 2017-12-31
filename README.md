@@ -1,11 +1,13 @@
-# tf-aws-state terraform module
-terraform module to create s3 state bucket and dynamodb lock table
+# tf-aws-s3-state terraform module
+
+Terraform module to create s3 state bucket and dynamodb lock table.
+Uses tf-aws-s3 with preset defaults to minimise config
 
 ## Features
 * create a state bucket
 * bucket suffix
 * random_id suffix
-* set bucket policy for encryption
+* set default encryption, AES256
 * Set ACL as 'private'
 * Enable versioning
 * Create a DynamoDB lock table with the same name as state bucket
@@ -17,19 +19,33 @@ terraform module to create s3 state bucket and dynamodb lock table
 
 
 ## Inputs
-#### Required
+| Name | Description | Type | Default | Required |
+|------|-------------|:----:|:-----:|:-----:|
+| abort_incomplete_multipart_upload_days | No. of days to wait before aborting incomplete multi-part uploads | string | `7` | no |
+| acl | Set canned ACL on bucket. Valid values are private, public-read, public-read-write, aws-exec-read, authenticated-read, bucket-owner-read, bucket-owner-full-control, log-delivery-write | string | `private` | no |
+| aws_region |  | string | `eu-west-1` | no |
+| bucket | The name of the state bucket. If omitted, Terraform will assign a random, unique name | string | `` | no |
+| bucket_suffix | enable bucket name suffix eg my-bucket-suffix | string | `` | no |
+| common_tags | common tags for bucket | map | `<map>` | no |
+| enable_abort_incomplete_multipart_upload | Lifecycle rule to abort incomplete multi-part uploads after a certain time | string | `false` | no |
+| enable_random_id_suffix | enable random_id suffix on bucket name eg my-bucket-de48g5 | string | `false` | no |
+| enable_versioning | Enable versioning on the bucket | string | `true` | no |
+| force_destroy | A boolean that indicates all objects should be deleted from the bucket so that the bucket can be destroyed without error | string | `false` | no |
+| kms_master_key_id | The AWS KMS master key ID used for the SSE-KMS encryption. This can only be used when you set the value of sse_algorithm as aws:kms. The default aws/s3 AWS KMS master key is used if this element is absent while the sse_algorithm is aws:kms | string | `` | no |
+| other_tags | other tags for bucket | map | `<map>` | no |
+| prevent_destroy | terraform lifecycle rule to prevent the removal of a bucket during a terraform destroy | string | `true` | no |
+| region | If specified, the AWS region this state bucket should reside in. Otherwise, the region used by the callee | string | `eu-west-1` | no |
+| sse_algorithm | The server-side encryption algorithm to use. Valid values are AES256 and aws:kms | string | `AES256` | no |
 
 
-#### Optional
-* `bucket` - (Optional, Forces new resource) The name of the bucket. If omitted, Terraform will assign a random, unique name.
-* `region` - (Optional) If specified, the AWS region this bucket should reside in. Otherwise, the region used by the callee.
-* `bucket_suffix` - Add a bucket suffix to the bucket name. eg bucketname-suffix bucket_suffix = "" disables the feature
-* `random_id_suffix_enable` - enable/disable random_id_suffix feature eg bucketname-d56gx7 or bucketname-suffix-d56gx7
-* `enable_versioning` - Enable versioning on the bucket
-* `force_destroy` - A boolean that indicates all objects should be deleted from the bucket so that the bucket can be destroyed without error
-* `common_tags` - Set Deloitte Cloud common tags on the bucket
-* `other_tags` - Set any other tags that are required
-* `prevent_destroy` - Terraform lifecycle rule to prevent the removal of a bucket during a destroy
+## Outputs
+| Name | Description |
+|------|-------------|
+| state_bucket_arn | The ARN of the bucket. Will be of format arn:aws:s3:::bucketname |
+| state_bucket_id | The name of the state bucket |
+| state_bucket_region | The AWS region this bucket resides in |
+| state_lock_table_arn | DynamoDB state lock table arn |
+| state_lock_table_id | DynamoDB state lock table name |
 
 
 ## Usage
@@ -37,28 +53,22 @@ terraform module to create s3 state bucket and dynamodb lock table
 module "my_state_backend" {
   source            = "github.com/bmacauley/tf-aws-s3-state//"
   bucket            = "p000123-tfstate"
-  bucket_suffix     = "bm-uk"
-  random_id_suffix_enable = 1
+  bucket_suffix            = "example-com"
+  enable_random_id_suffix = true
   common_tags  = {
-    "created_by"   =  "terraform"
-    "project_id"   =  "p000123"
-    "project_name" =  "test"
-    "environment"  =  "dev"
-    "component"    =  "bucket"
-
+    terraform     =  "true"
+    project_id    =  "p000123"
+    project_name  =  "test"
+    environment   =  "sbx"
+    component     =  "tf-state-bucket"
   }
-
 }
 ```
 
 
+## Examples
+[create state bucket](/examples/create_state_bucket)
 
-## Outputs
-* `state_bucket_id` - The name of the state bucket
-* `state_bucket_arn` - The ARN of the bucket. Will be of format arn:aws:s3:::bucketname
-* `state_bucket_region` - The AWS region this bucket resides in
-* `state_lock_table_id` - DynamoDB state lock table name
-* `state_lock_table_arn` - DynamoDB state lock table arn
 
 ## Authors
 * [Brian Macauley](https://github.com/bmacauley) &lt;brian.macauley@gmail.com&gt;

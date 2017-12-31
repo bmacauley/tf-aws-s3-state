@@ -7,22 +7,21 @@ provider "aws" {
 }
 
 
-
 # Create an S3 state bucket
 module "terraform_state_bucket" {
-  source = "git::https:/github.com/bmacauley/tf-aws-s3//?ref=v0.1"
+  source = "github.com/bmacauley/tf-aws-s3//?ref=v0.2"
   region            = "${var.region}"
   bucket            = "${var.bucket}"
+  acl               = "${var.acl}"
+  sse_algorithm     = "${var.sse_algorithm}"
   bucket_suffix     = "${var.bucket_suffix}"
-  random_id_suffix_enable = "${var.random_id_suffix_enable}"
-  acl               = "private"
-  enable_versioning = true
+  enable_random_id_suffix = "${var.enable_random_id_suffix}"
+  enable_versioning = "${var.enable_versioning}"
   force_destroy     = "${var.force_destroy}"
+  prevent_destroy   = "${var.prevent_destroy}"
   common_tags       = "${var.common_tags}"
   other_tags        = "${var.other_tags}"
-  prevent_destroy   = "${var.prevent_destroy}"
 }
-
 
 
 # Create a DynamoDB state lock table
