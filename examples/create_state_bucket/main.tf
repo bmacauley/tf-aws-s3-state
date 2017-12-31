@@ -14,7 +14,7 @@ module "my_state_backend" {
   enable_random_id_suffix = true
 
   common_tags  = {
-    created_by   =  "terraform"
+    terraform   =  "true"
     project_id   =  "p000123"
     project_name =  "test"
     environment  =  "sbx"
